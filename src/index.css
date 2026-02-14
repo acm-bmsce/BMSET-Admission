@@ -1,0 +1,30 @@
+/* src/index.css */
+@import "tailwindcss";
+
+
+
+@layer base {
+  body {
+    background-color: var(--color-theme-bg);
+    color: var(--color-theme-text);
+  }
+}
+
+
+@theme {
+  
+  /* Core Colors */
+  --color-theme-primary: #1a2530;   /* Navy Blue - Headings, Footer text */
+  --color-theme-accent: #ea580c;    /* Orange - Buttons, Icons, Highlights */
+  --color-theme-hover: #c2410c;     /* Darker Orange for hover states */
+
+  /* Backgrounds */
+  --color-theme-bg: #f8f9fa;        /* Main website background */
+  --color-theme-card: #ffffff;      /* Card background */
+  --color-theme-footer: #131d2b;    /* Footer background */
+
+  /* Text Colors */
+  --color-theme-text: #1a2530;      /* Standard text */
+  --color-theme-muted: #64748b;     /* Descriptions, secondary text */
+  --color-theme-inverse: #ffffff;   /* Text on top of dark/accent colors */
+}
