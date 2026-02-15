@@ -23,7 +23,7 @@ export default function Header() {
         {/* UPDATED: Left side is now purely the Image Logo */}
         <Link to="/" className="flex items-center cursor-pointer">
           <img 
-            src="/BMSETLOGO.png" 
+            src="/BMSETLOGO.webp" 
             alt="BMSET Logo" 
             className="h-14 w-auto object-contain" 
           />

@@ -5,7 +5,6 @@ import { institutes } from '../data/institutes';
 export default function InstituteDetail() {
   const { id } = useParams();
   
-  // 1. New State to track if the custom background image exists
   const [bgImageExists, setBgImageExists] = useState(true);
   
   const institute = institutes.find(inst => inst["Institute"].toLowerCase() === id);
@@ -13,7 +12,6 @@ export default function InstituteDetail() {
   useEffect(() => {
     if (institute) {
       localStorage.setItem('lastVisitedInstitute', id);
-      // 2. Reset the check whenever the institute changes (optimistically assume image exists)
       setBgImageExists(true);
     }
   }, [id, institute]);
@@ -25,7 +23,6 @@ export default function InstituteDetail() {
   const programsOffered = institute["Programs Offered"] || {};
   const programCategories = Object.keys(programsOffered);
   
-  // Construct the dynamic image path (e.g., "/BMSCEBG.png")
   const bgImagePath = `/${institute["Institute"]}BG.png`;
 
   return (
@@ -39,29 +36,21 @@ export default function InstituteDetail() {
 
       {/* Institute Header */}
       <div className="bg-theme-card rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-12">
-        
-        {/* Main Header Container - We keep bg-theme-primary as a safe fallback color behind everything */}
         <div className="bg-theme-primary p-8 text-theme-inverse relative overflow-hidden min-h-50 flex flex-col justify-center">
-          
-          {/* LOGIC: Check for Custom Background Image */}
           {bgImageExists ? (
             <>
-              {/* 1. The Custom Image */}
               <img 
                 src={bgImagePath} 
                 alt="Institute Background"
                 className="absolute inset-0 w-full h-full object-cover z-0"
-                onError={() => setBgImageExists(false)} // If 404, switch to fallback mode
+                onError={() => setBgImageExists(false)}
               />
-              {/* 2. Dark Overlay - Essential for reading white text on top of photos */}
               <div className="absolute inset-0 bg-black/60 z-0"></div>
             </>
           ) : (
-             /* FALLBACK: The original blob design (Only shows if bgImageExists is false) */
             <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full -translate-y-1/2 translate-x-1/3 z-0"></div>
           )}
 
-          {/* Text Content (z-10 ensures it sits ON TOP of the image/overlay) */}
           <h2 className="text-3xl font-bold mb-2 relative z-10">{institute["Full form"]}</h2>
           <p className="text-theme-accent font-semibold relative z-10">{institute["Institute"]}</p>
         </div>
@@ -80,17 +69,31 @@ export default function InstituteDetail() {
               <div key={index} className="mb-12">
                 <div className="mb-6 flex items-center justify-between">
                   <h3 className="text-2xl font-bold text-theme-primary">{categoryName} Programs</h3>
-                  <div className="h-1 grow bg-gray-200 ml-6 rounded-full overflow-hidden">
-                      <div className="w-24 h-full bg-theme-accent"></div>
-                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {courseList.map((courseName, idx) => (
-                    <div key={idx} className="bg-theme-card border border-gray-100 p-6 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group flex flex-col h-full">
-                      <div className="absolute left-0 top-0 bottom-0 w-1 bg-theme-accent translate-x-full group-hover:translate-x-0 transition-transform"></div>
-                      <h4 className="text-lg font-bold text-theme-primary mb-4 pr-4 grow">{courseName}</h4>
-
+                    <div 
+                      key={idx} 
+                      className="
+                        bg-theme-card border border-gray-100 p-6 
+                        shadow-sm hover:shadow-lg 
+                        transition-all duration-300 ease-in-out
+                        group flex flex-col h-full rounded-xl
+                        cursor-default
+                        /* HOVER EFFECTS START HERE */
+                        hover:bg-theme-accent hover:border-theme-accent hover:-translate-y-1
+                      "
+                    >
+                      <h4 
+                        className="
+                          text-lg font-bold text-theme-primary mb-0 pr-4 grow 
+                          transition-colors duration-300
+                          group-hover:text-white
+                        "
+                      >
+                        {courseName}
+                      </h4>
                     </div>
                   ))}
                 </div>
