@@ -69,7 +69,24 @@ export const institutes = [
 },
 {
     "Institute" : "BMSPUCW",
-    "Programs Offered" : {},
+    "Programs Offered" : {
+        "PUC Science":{
+            "1":"PCMB",
+            "2":"PCME",
+            "3":"PCMC"
+        },
+        "PUC Commerce":{
+            "1":"SEBA",
+            "2":"HEBA",
+            "3":"MEBA",
+            "4":"MSBA",
+            "5":"CSBA"
+        },
+        "PUC Arts":{
+            "1":"HEPS",
+            "2":"HEPP"
+        }
+    },
     "Full form" : "BMS P U College for Women",
     "Link" : "https://bmset.org/bmspu.php"
 },
