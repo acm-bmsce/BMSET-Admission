@@ -240,7 +240,7 @@ export const institutes = [
       }
     },
     "Full form" : "BMS University",
-    "Link" : " "
+    "Link" : "https://bmsuniversity.ac.in"
 }
 ]
 
