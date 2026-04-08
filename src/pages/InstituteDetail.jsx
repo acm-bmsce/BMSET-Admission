@@ -63,7 +63,11 @@ export default function InstituteDetail() {
         <div className="grow">
           {programCategories.map((categoryName, index) => {
             const coursesObject = programsOffered[categoryName];
-            const courseList = Object.values(coursesObject).sort((a, b) => a.localeCompare(b));
+            
+            // Sort by the 'name' property of the course object
+            const courseList = Object.values(coursesObject).sort((a, b) => 
+              a.name.localeCompare(b.name)
+            );
 
             return (
               <div key={index} className="mb-12">
@@ -72,7 +76,7 @@ export default function InstituteDetail() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {courseList.map((courseName, idx) => (
+                  {courseList.map((course, idx) => (
                     <div 
                       key={idx} 
                       className="
@@ -87,13 +91,28 @@ export default function InstituteDetail() {
                     >
                       <h4 
                         className="
-                          text-lg font-bold text-theme-primary mb-0 pr-4 grow 
+                          text-lg font-bold text-theme-primary mb-3 pr-4 grow 
                           transition-colors duration-300
                           group-hover:text-white
                         "
                       >
-                        {courseName}
+                        {course.name}
                       </h4>
+
+                      {/* Fees and Intake Section */}
+                      <div className="mt-auto flex flex-col gap-1 text-base text-black transition-colors duration-300 group-hover:text-white">
+                        <div className="flex justify-between border-t border-gray-100 group-hover:border-white/20 pt-2 mt-2">
+                          <span className="font-medium">Intake:</span>
+                          <span>{course.intake ? `${course.intake} Seats` : 'Not available'}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="font-medium">Fees:</span>
+                          <span className={course.fees ? "font-bold" : "font-normal italic"}>
+                            {course.fees || 'Not available'}
+                          </span>
+                        </div>
+                      </div>
+
                     </div>
                   ))}
                 </div>
