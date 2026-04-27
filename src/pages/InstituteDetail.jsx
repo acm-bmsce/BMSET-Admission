@@ -111,6 +111,24 @@ export default function InstituteDetail() {
                             {course.fees || 'Not available'}
                           </span>
                         </div>
+                        
+                        {/* Waitlist Registration Message */}
+                        {course.reg_open === false && (
+                          <div className="mt-3 pt-3 border-t border-gray-100 group-hover:border-white/20">
+                            <p className="font-bold text-sm text-center">
+                              Admission Closed.{' '}
+                              <a 
+                                href="https://forms.gle/D3DGbCKApYTqnkTw6" 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="underline underline-offset-2 hover:opacity-80 transition-opacity"
+                              >
+                                Register here for waitlist
+                              </a>
+                            </p>
+                          </div>
+                        )}
+                        
                       </div>
 
                     </div>
