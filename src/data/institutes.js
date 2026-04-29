@@ -46,7 +46,7 @@ export const institutes = [
           "name": "Chemical Engineering",
           "fees": "₹4,00,000/yr",
           "intake": "60",
-          "reg_open": true
+          "reg_open": false
         },
         "8": {
           "name": "Bio-Technology",
