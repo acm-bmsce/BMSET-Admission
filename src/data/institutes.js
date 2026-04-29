@@ -70,7 +70,7 @@ export const institutes = [
           "name": "Computer Science & Engineering (Data Science)",
           "fees": "₹12,00,000/yr",
           "intake": "120",
-          "reg_open": true
+          "reg_open": false
         },
         "13": {
           "name": "Computer Science & Engineering (IOT & Cyber Security including Blockchain Technology)",
@@ -141,7 +141,7 @@ export const institutes = [
           "name": "Mechanical Engineering",
           "fees": "₹2,00,000/yr",
           "intake": "60",
-          "reg_open": true
+          "reg_open": false
         },
         "4": {
           "name": "Electrical and Electronics Engineering",
