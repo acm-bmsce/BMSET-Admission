@@ -1,47 +1,56 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { institutes } from '../data/institutes';
+import { db } from '../firebase';
+import { doc, getDoc } from 'firebase/firestore';
 
 export default function InstituteDetail() {
-  const { id } = useParams();
-  
+  const { id } = useParams(); // e.g., "bmsce"
+  const [institute, setInstitute] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [bgImageExists, setBgImageExists] = useState(true);
-  
-  const institute = institutes.find(inst => inst["Institute"].toLowerCase() === id);
 
   useEffect(() => {
-    if (institute) {
-      localStorage.setItem('lastVisitedInstitute', id);
-      setBgImageExists(true);
-    }
-  }, [id, institute]);
+    const fetchInstitute = async () => {
+      setLoading(true);
+      try {
+        // We convert id to uppercase because our Firestore Doc IDs are uppercase (BMSCE)
+        const docRef = doc(db, "institutes", id.toUpperCase());
+        const docSnap = await getDoc(docRef);
 
-  if (!institute) {
-    return <div className="text-center py-20 text-xl font-bold text-theme-primary">Institute not found.</div>;
-  }
+        if (docSnap.exists()) {
+          setInstitute(docSnap.data());
+          localStorage.setItem('lastVisitedInstitute', id);
+        }
+      } catch (error) {
+        console.error("Error fetching institute:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchInstitute();
+  }, [id]);
+
+  if (loading) return <div className="text-center py-20 font-bold text-theme-primary">Loading Details...</div>;
+  if (!institute) return <div className="text-center py-20 text-xl font-bold text-theme-primary">Institute not found.</div>;
 
   const programsOffered = institute["Programs Offered"] || {};
   const programCategories = Object.keys(programsOffered);
-  
   const bgImagePath = `/${institute["Institute"]}BG.png`;
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-12 animate-fade-in flex flex-col min-h-[70vh]">
-      <Link 
-        to="/"
-        className="inline-flex items-center gap-2 text-theme-muted hover:text-theme-accent font-semibold text-sm transition-colors mb-6 self-start"
-      >
+      <Link to="/" className="inline-flex items-center gap-2 text-theme-muted hover:text-theme-accent font-semibold text-sm mb-6 self-start">
         <span>&larr;</span> Back to Institutes
       </Link>
 
-      {/* Institute Header */}
       <div className="bg-theme-card rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-12">
         <div className="bg-theme-primary p-8 text-theme-inverse relative overflow-hidden min-h-50 flex flex-col justify-center">
           {bgImageExists ? (
             <>
               <img 
                 src={bgImagePath} 
-                alt="Institute Background"
+                alt="Background"
                 className="absolute inset-0 w-full h-full object-cover z-0"
                 onError={() => setBgImageExists(false)}
               />
@@ -50,109 +59,58 @@ export default function InstituteDetail() {
           ) : (
             <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full -translate-y-1/2 translate-x-1/3 z-0"></div>
           )}
-
           <h2 className="text-3xl font-bold mb-2 relative z-10">{institute["Full form"]}</h2>
           <p className="text-theme-accent font-semibold relative z-10">{institute["Institute"]}</p>
         </div>
       </div>
 
-      {/* Dynamic Programs Rendering */}
-      {programCategories.length === 0 ? (
-        <p className="text-theme-muted italic grow">Course details will be updated shortly.</p>
-      ) : (
-        <div className="grow">
-          {programCategories.map((categoryName, index) => {
+      <div className="grow">
+        {programCategories.length === 0 ? (
+          <p className="text-theme-muted italic">Course details will be updated shortly.</p>
+        ) : (
+          programCategories.map((categoryName, index) => {
             const coursesObject = programsOffered[categoryName];
-            
-            // Sort by the 'name' property of the course object
-            const courseList = Object.values(coursesObject).sort((a, b) => 
-              a.name.localeCompare(b.name)
-            );
+            const courseList = Object.values(coursesObject).sort((a, b) => a.name.localeCompare(b.name));
 
             return (
               <div key={index} className="mb-12">
-                <div className="mb-6 flex items-center justify-between">
-                  <h3 className="text-2xl font-bold text-theme-primary">{categoryName} Programs</h3>
-                </div>
-
+                <h3 className="text-2xl font-bold text-theme-primary mb-6">{categoryName} Programs</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {courseList.map((course, idx) => (
-                    <div 
-                      key={idx} 
-                      className="
-                        bg-theme-card border border-gray-100 p-6 
-                        shadow-sm hover:shadow-lg 
-                        transition-all duration-300 ease-in-out
-                        group flex flex-col h-full rounded-xl
-                        cursor-default
-                        /* HOVER EFFECTS START HERE */
-                        hover:bg-theme-accent hover:border-theme-accent hover:-translate-y-1
-                      "
-                    >
-                      <h4 
-                        className="
-                          text-lg font-bold text-theme-primary mb-3 pr-4 grow 
-                          transition-colors duration-300
-                          group-hover:text-white
-                        "
-                      >
+                    <div key={idx} className="bg-theme-card border border-gray-100 p-6 shadow-sm hover:shadow-lg transition-all group flex flex-col h-full rounded-xl hover:bg-theme-accent hover:border-theme-accent hover:-translate-y-1">
+                      <h4 className="text-lg font-bold text-theme-primary mb-3 pr-4 grow group-hover:text-white transition-colors">
                         {course.name}
                       </h4>
-
-                      {/* Fees and Intake Section */}
-                      <div className="mt-auto flex flex-col gap-1 text-base text-black transition-colors duration-300 group-hover:text-white">
+                      <div className="mt-auto flex flex-col gap-1 text-base text-black group-hover:text-white transition-colors">
                         <div className="flex justify-between border-t border-gray-100 group-hover:border-white/20 pt-2 mt-2">
                           <span className="font-medium">Intake:</span>
                           <span>{course.intake ? `${course.intake} Seats` : 'Not available'}</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="font-medium">Fees:</span>
-                          <span className={course.fees ? "font-bold" : "font-normal italic"}>
-                            {course.fees || 'Not available'}
-                          </span>
+                          <span className={course.fees ? "font-bold" : "italic"}>{course.fees || 'Not available'}</span>
                         </div>
-                        
-                        {/* Waitlist Registration Message */}
                         {course.reg_open === false && (
                           <div className="mt-3 pt-3 border-t border-gray-100 group-hover:border-white/20">
                             <p className="font-bold text-sm text-center">
-                              Admission Closed.{' '}
-                              <a 
-                                href="https://forms.gle/D3DGbCKApYTqnkTw6" 
-                                target="_blank" 
-                                rel="noopener noreferrer"
-                                className="underline underline-offset-2 hover:opacity-80 transition-opacity"
-                              >
-                                Register here for waitlist
-                              </a>
+                              Admission Closed. <a href="https://forms.gle/D3DGbCKApYTqnkTw6" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">Register here for waitlist</a>
                             </p>
                           </div>
                         )}
-                        
                       </div>
-
                     </div>
                   ))}
                 </div>
               </div>
             );
-          })}
-        </div>
-      )}
+          })
+        )}
+      </div>
 
-      {/* View More External Link Button */}
       {institute["Link"] && (
         <div className="mt-8 mb-4 text-center">
-          <a 
-            href={institute["Link"]} 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 bg-theme-accent hover:bg-theme-hover text-white px-8 py-3.5 rounded font-bold transition-all shadow-md hover:shadow-lg hover:-translate-y-0.5"
-          >
+          <a href={institute["Link"]} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 bg-theme-accent hover:bg-theme-hover text-white px-8 py-3.5 rounded font-bold transition-all shadow-md">
             Visit Official Institute Website
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-            </svg>
           </a>
         </div>
       )}

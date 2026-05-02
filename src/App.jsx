@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
 import Footer from './components/Footer';
 import Home from './pages/Home';
+import Admin from './pages/Admin';
 import InstituteDetail from './pages/InstituteDetail';
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/institute/:id" element={<InstituteDetail />} />
+            <Route path="/bmsce1946" element={<Admin />} />
           </Routes>
         </main>
 
