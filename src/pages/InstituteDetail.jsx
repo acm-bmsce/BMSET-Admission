@@ -38,6 +38,21 @@ export default function InstituteDetail() {
   const programCategories = Object.keys(programsOffered);
   const bgImagePath = `/${institute["Institute"]}BG.png`;
 
+  // Convert id to lowercase just in case the URL parameter is capitalized
+  const lowerCaseId = id?.toLowerCase();
+
+  const brochureLinks = {
+    bmsce: "/brochures/bmsce.pdf",
+  };
+
+const videoLinks = {
+  bmsce: "https://drive.google.com/file/d/BMSCE_FILE_ID/preview",
+  bmsit: "https://drive.google.com/file/d/BMSIT_FILE_ID/preview",
+};
+
+  const brochure = brochureLinks[lowerCaseId];
+  const video = videoLinks[lowerCaseId];
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-12 animate-fade-in flex flex-col min-h-[70vh]">
       <Link to="/" className="inline-flex items-center gap-2 text-theme-muted hover:text-theme-accent font-semibold text-sm mb-6 self-start">
@@ -107,13 +122,64 @@ export default function InstituteDetail() {
         )}
       </div>
 
-      {institute["Link"] && (
-        <div className="mt-8 mb-4 text-center">
-          <a href={institute["Link"]} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 bg-theme-accent hover:bg-theme-hover text-white px-8 py-3.5 rounded font-bold transition-all shadow-md">
+      <div className="mt-8 mb-4 flex flex-wrap gap-4 justify-center">
+
+        {institute["Link"] && (
+          <a
+            href={institute["Link"]}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 bg-theme-accent hover:bg-theme-hover text-white px-8 py-3.5 rounded font-bold transition-all shadow-md"
+          >
             Visit Official Institute Website
           </a>
-        </div>
-      )}
+        )}
+
+        {/* --- NEW LOCAL BROCHURE BUTTON --- */}
+        {brochure && (
+          <a
+            href={brochure}
+            target="_blank"
+            rel="noopener noreferrer"
+            download // Optional: Remove if you want it to open in a tab instead of directly downloading
+            className="inline-flex items-center gap-2 bg-orange-600 hover:bg-theme-hover text-white px-8 py-3.5 rounded font-bold transition-all shadow-md"
+          >
+            View Local Brochure
+          </a>
+        )}
+
+        {institute["BrochurePDF"] && (
+          <a
+            href={institute["BrochurePDF"]}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 bg-theme-primary hover:bg-theme-hover text-white px-8 py-3.5 rounded font-bold transition-all shadow-md"
+          >
+            View Brochure PDF
+          </a>
+        )}
+
+        
+
+      </div>
+      {video && (
+  <div className="mt-10">
+    <h3 className="text-2xl font-bold text-theme-primary mb-4 text-center">
+      Campus Tour Video
+    </h3>
+
+    <div className="rounded-2xl overflow-hidden shadow-lg border border-gray-200">
+      <iframe
+        src={video}
+        width="100%"
+        height="500"
+        allow="autoplay"
+        allowFullScreen
+        className="w-full"
+      ></iframe>
+    </div>
+  </div>
+)}
     </div>
   );
 }

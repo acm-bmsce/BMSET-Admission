@@ -73,6 +73,17 @@ export default function Home() {
           );
         })}
       </div>
+
+      <div className="mt-12 flex justify-center">
+        <a
+          href="/brochures/ICDB.pdf"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white px-8 py-3.5 rounded font-bold transition-all shadow-md"
+        >
+          View ICD Brochure
+        </a>
+      </div>
     </div>
   );
 }
