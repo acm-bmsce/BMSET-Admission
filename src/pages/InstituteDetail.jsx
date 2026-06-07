@@ -8,12 +8,14 @@ export default function InstituteDetail() {
   const [institute, setInstitute] = useState(null);
   const [loading, setLoading] = useState(true);
   const [bgImageExists, setBgImageExists] = useState(true);
+  
+  // State to track which video in the array is currently playing
+  const [activeVideoIndex, setActiveVideoIndex] = useState(0);
 
   useEffect(() => {
     const fetchInstitute = async () => {
       setLoading(true);
       try {
-        // We convert id to uppercase because our Firestore Doc IDs are uppercase (BMSCE)
         const docRef = doc(db, "institutes", id.toUpperCase());
         const docSnap = await getDoc(docRef);
 
@@ -38,24 +40,32 @@ export default function InstituteDetail() {
   const programCategories = Object.keys(programsOffered);
   const bgImagePath = `/${institute["Institute"]}BG.png`;
 
-  // Convert id to lowercase just in case the URL parameter is capitalized
   const lowerCaseId = id?.toLowerCase();
 
   const brochureLinks = {
     bmsce: "/brochures/bmsce.pdf",
   };
 
-const videoLinks = {
-  bmsce: "https://drive.google.com/file/d/BMSCE_FILE_ID/preview",
-  bmsit: "https://drive.google.com/file/d/BMSIT_FILE_ID/preview",
-};
+  // --- UPDATED: Now uses arrays to support multiple videos per institute ---
+  const videoLinks = {
+    bmsce: [
+      "https://drive.google.com/file/d/1pgR8GDsjrdfqBlc7cmyLJp8zUiIMGHVM/preview",
+      "https://drive.google.com/file/d/1Q1pFk8IlxzKmJx8lGbUHaST3-C4OkE47/preview"
+    ],
+    bmsit: [
+      "https://drive.google.com/file/d/1zuf2uvp6-ZHLiTl1Nv8TZ8N8hBgKnxEY/preview"
+    ],
+  };
 
   const brochure = brochureLinks[lowerCaseId];
-  const video = videoLinks[lowerCaseId];
+  
+  // Grab the array of videos, or fallback to the DB video if it exists
+  const videos = videoLinks[lowerCaseId] || (institute["CampusVideo"] ? [institute["CampusVideo"]] : []);
+  const currentVideo = videos[activeVideoIndex];
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-12 animate-fade-in flex flex-col min-h-[70vh]">
-      <Link to="/" className="inline-flex items-center gap-2 text-theme-muted hover:text-theme-accent font-semibold text-sm mb-6 self-start">
+      <Link to="/" className="inline-flex items-center gap-2 text-theme-muted hover:text-orange-600 font-semibold text-sm mb-6 self-start transition-colors">
         <span>&larr;</span> Back to Institutes
       </Link>
 
@@ -75,7 +85,7 @@ const videoLinks = {
             <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full -translate-y-1/2 translate-x-1/3 z-0"></div>
           )}
           <h2 className="text-3xl font-bold mb-2 relative z-10">{institute["Full form"]}</h2>
-          <p className="text-theme-accent font-semibold relative z-10">{institute["Institute"]}</p>
+          <p className="text-orange-500 font-semibold relative z-10">{institute["Institute"]}</p>
         </div>
       </div>
 
@@ -92,7 +102,7 @@ const videoLinks = {
                 <h3 className="text-2xl font-bold text-theme-primary mb-6">{categoryName} Programs</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {courseList.map((course, idx) => (
-                    <div key={idx} className="bg-theme-card border border-gray-100 p-6 shadow-sm hover:shadow-lg transition-all group flex flex-col h-full rounded-xl hover:bg-theme-accent hover:border-theme-accent hover:-translate-y-1">
+                    <div key={idx} className="bg-theme-card border border-gray-100 p-6 shadow-sm hover:shadow-lg transition-all group flex flex-col h-full rounded-xl hover:bg-orange-600 hover:border-orange-600 hover:-translate-y-1">
                       <h4 className="text-lg font-bold text-theme-primary mb-3 pr-4 grow group-hover:text-white transition-colors">
                         {course.name}
                       </h4>
@@ -122,27 +132,60 @@ const videoLinks = {
         )}
       </div>
 
-      <div className="mt-8 mb-4 flex flex-wrap gap-4 justify-center">
+      {/* --- UPDATED MULTI-VIDEO PLAYER --- */}
+      {videos.length > 0 && (
+        <div className="mt-8 mb-12 flex flex-col items-center">
+          <h3 className="text-xl font-bold text-theme-primary mb-4">Campus Video Preview</h3>
+          <div className="w-full max-w-3xl aspect-video bg-black rounded-xl overflow-hidden shadow-md">
+            <iframe 
+              src={currentVideo} 
+              allow="autoplay" 
+              allowFullScreen
+              className="w-full h-full border-0"
+              title={`Campus Video ${activeVideoIndex + 1}`}
+            ></iframe>
+          </div>
+          
+          {/* Video Switcher Buttons (only shows if there is more than 1 video) */}
+          {videos.length > 1 && (
+            <div className="flex flex-wrap gap-3 mt-6">
+              {videos.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setActiveVideoIndex(index)}
+                  className={`px-6 py-2 rounded-full font-bold transition-all shadow-sm ${
+                    activeVideoIndex === index
+                      ? 'bg-orange-600 text-white'
+                      : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                  }`}
+                >
+                  Part {index + 1}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
+      {/* Action Buttons */}
+      <div className="mt-4 mb-4 flex flex-wrap gap-4 justify-center">
         {institute["Link"] && (
           <a
             href={institute["Link"]}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 bg-theme-accent hover:bg-theme-hover text-white px-8 py-3.5 rounded font-bold transition-all shadow-md"
+            className="inline-flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white px-8 py-3.5 rounded font-bold transition-all shadow-md"
           >
             Visit Official Institute Website
           </a>
         )}
 
-        {/* --- NEW LOCAL BROCHURE BUTTON --- */}
         {brochure && (
           <a
             href={brochure}
             target="_blank"
             rel="noopener noreferrer"
-            download // Optional: Remove if you want it to open in a tab instead of directly downloading
-            className="inline-flex items-center gap-2 bg-orange-600 hover:bg-theme-hover text-white px-8 py-3.5 rounded font-bold transition-all shadow-md"
+            className="inline-flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white px-8 py-3.5 rounded font-bold transition-all shadow-md"
           >
             View Local Brochure
           </a>
@@ -153,33 +196,12 @@ const videoLinks = {
             href={institute["BrochurePDF"]}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 bg-theme-primary hover:bg-theme-hover text-white px-8 py-3.5 rounded font-bold transition-all shadow-md"
+            className="inline-flex items-center gap-2 bg-theme-primary hover:opacity-90 text-white px-8 py-3.5 rounded font-bold transition-all shadow-md"
           >
             View Brochure PDF
           </a>
         )}
-
-        
-
       </div>
-      {video && (
-  <div className="mt-10">
-    <h3 className="text-2xl font-bold text-theme-primary mb-4 text-center">
-      Campus Tour Video
-    </h3>
-
-    <div className="rounded-2xl overflow-hidden shadow-lg border border-gray-200">
-      <iframe
-        src={video}
-        width="100%"
-        height="500"
-        allow="autoplay"
-        allowFullScreen
-        className="w-full"
-      ></iframe>
-    </div>
-  </div>
-)}
     </div>
   );
 }
